@@ -1,8 +1,8 @@
 # Robin Kalia
 # robinkalia@berkeley.edu
 #
-# Using gynasium API to simulate interactions between
-# environment and an RL agent.
+# Using Gymnasium API to simulate interactions between environment
+# and an RL agent for the sample CartPole environment.
 
 import gymnasium as gym
 import random
