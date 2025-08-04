@@ -1,7 +1,7 @@
 # Robin Kalia
 # robinkalia@berkeley.edu
-# 
-# A dummy implementation of a reinforcement learning problem 
+#
+# A dummy implementation of a reinforcement learning problem
 # with a dummy environment and a simple agent.
 
 from typing import List
@@ -11,23 +11,23 @@ import random
 class Environment:
     # Internal state of the environment.
     def __init__(self):
-        # Corresponds to maximum number of steps 
+        # Corresponds to maximum number of steps
         # allowed in an episode.
         self.rem_steps = 20
-    
+
     # Dummy Observations.
     def get_observations(self) -> List[float]:
         return [0.0, 0.0, 0.0]
-    
+
     # Dummy Actions.
     def get_actions(self) -> List[int]:
         return [0, 1]
-    
-    # Check if the environment is still receptive to 
+
+    # Check if the environment is still receptive to
     # communication by the agent.
     def is_done(self) -> bool:
         return self.rem_steps == 0
-    
+
     # For a given action taken by the agent,
     # return the reward from the environment.
     def action(self, action: int) -> float:
@@ -47,7 +47,7 @@ class Agent:
     def __init__(self):
         self.total_reward = 0
 
-    # Take a step: 
+    # Take a step:
     # a) Get the list of observations from the environment.
     # b) Get the possible actions that can be taken.
     # c) Choose a specific action.
