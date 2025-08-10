@@ -9,16 +9,17 @@ $ python3 simple_rl_agent_environment.py
 ```
 
 Install conda and create a virtual environment to install gymnasium
-and other corresponding gymnasium environments.
+and other corresponding gymnasium environments. Just use python version 3.9
+because of compatibility issues arising from being able to use different
+environments from ALE.
 ```
-$ conda create --name deep_rl
-$ conda activate deep_rl
-$ conda config --add channels conda-forge
-$ conda config --set channel_priority strict
-$ conda install gymnasium gymnasium-all gymnasium-atari gymnasium-box2d gymnasium-classic_control gymnasium-mujoco gymnasium-other gymnasium-toy_text
+$ conda create --name deep_rl_python_3.9 python=3.9
+$ conda activate deep_rl_python_3.9
+$ pip install -r requirements.txt
 ```
 
-Now run
+Now run the following scripts:-
+1) `simple_gymnasium_rl_agent.py`: Shows the use of gymnasium library to code up your first RL agent.
 ```
 $ python3 simple_gymnasium_rl_agent.py
 ```
@@ -61,4 +62,31 @@ Selected random action:  0
 Current Episode finished. Steps executed = 995
 Selected random action:  1
 RL Agent interaction complete after 1000 steps with total reward = 1000.00
+```
+
+2) `gan_atari_image_synthesis.py`: A GAN based model used to generate Atari images using the ALE evironment for different Atari games, specifically 10 popular games - `Breakout`, `Alien`, `Atlantis`, `Robotank`, `Pitfall`, `VideoCube`, `VideoCheckers`, `BattleZone`, `Qbert`, and `KungFuMaster`.
+```
+python gan_atari_image_synthesis.py
+```
+
+```
+Finished 677700 iterations for batch_size 16 in 504 mins 31.83 seconds: gen_loss=12.1387, dis_loss=0.0000403
+Finished 677800 iterations for batch_size 16 in 504 mins 35.29 seconds: gen_loss=12.3392, dis_loss=0.0000335
+Finished 677900 iterations for batch_size 16 in 504 mins 38.68 seconds: gen_loss=12.3962, dis_loss=0.0000269
+Finished 678000 iterations for batch_size 16 in 504 mins 42.01 seconds: gen_loss=13.1129, dis_loss=0.0000199
+
+Saving image in tensorboard at Iteration No 678000
+
+Finished 678100 for batch_size 16 in 504 mins 45.50 seconds: gen_loss=12.6176, dis_loss=0.0033006
+Finished 678200 for batch_size 16 in 504 mins 48.81 seconds: gen_loss=13.2425, dis_loss=0.0000756
+...
+...
+Finished 999700 iterations for batch_size 16 in 687 mins 30.45 seconds: gen_loss=9.7217, dis_loss=0.0002342
+Finished 999800 iterations for batch_size 16 in 687 mins 33.83 seconds: gen_loss=9.8177, dis_loss=0.0002536
+Finished 999900 iterations for batch_size 16 in 687 mins 37.16 seconds: gen_loss=9.5558, dis_loss=0.0008187
+Finished 1000000 iterations for batch_size 16 in 687 mins 40.59 seconds: gen_loss=9.4748, dis_loss=0.0003078
+
+Saving image in tensorboard at Iteration No 1000000
+
+Finished training the network: 1000000 iterations in 687 mins and 40 seconds.
 ```
