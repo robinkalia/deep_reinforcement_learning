@@ -64,7 +64,7 @@ Selected random action:  1
 RL Agent interaction complete after 1000 steps with total reward = 1000.00
 ```
 
-2) `gan_atari_image_synthesis.py`: A GAN based model used to generate Atari images using the ALE evironment for different Atari games, specifically 10 popular games - `Breakout`, `Alien`, `Atlantis`, `Robotank`, `Pitfall`, `VideoCube`, `VideoCheckers`, `BattleZone`, `Qbert`, and `KungFuMaster`.
+2) [WIP] `gan_atari_image_synthesis.py`: A GAN based model used to generate Atari images using the ALE evironment for different Atari games, specifically 10 popular games - `Breakout`, `Alien`, `Atlantis`, `Robotank`, `Pitfall`, `VideoCube`, `VideoCheckers`, `BattleZone`, `Qbert`, and `KungFuMaster`.
 ```
 python gan_atari_image_synthesis.py
 ```
