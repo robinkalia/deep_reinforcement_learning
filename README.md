@@ -77,23 +77,45 @@ Sample images from tensorboard where `real` corresponds to the real Atari games'
 <img width="1067" height="1118" alt="Screenshot for GANs with Deep Reinforcement Learning - 1" src="https://github.com/user-attachments/assets/16defce1-5a6b-4188-b715-66e0d125ea50" />
 
 ```
-Finished 677700 iterations for batch_size 16 in 504 mins 31.83 seconds: gen_loss=12.1387, dis_loss=0.0000403
-Finished 677800 iterations for batch_size 16 in 504 mins 35.29 seconds: gen_loss=12.3392, dis_loss=0.0000335
-Finished 677900 iterations for batch_size 16 in 504 mins 38.68 seconds: gen_loss=12.3962, dis_loss=0.0000269
-Finished 678000 iterations for batch_size 16 in 504 mins 42.01 seconds: gen_loss=13.1129, dis_loss=0.0000199
+Running in PRODUCTION mode...
 
-Saving image in tensorboard at Iteration No 678000
+A.L.E: Arcade Learning Environment (version 0.8.1+53f58b7)
+[Powered by Stella]
 
-Finished 678100 for batch_size 16 in 504 mins 45.50 seconds: gen_loss=12.6176, dis_loss=0.0033006
-Finished 678200 for batch_size 16 in 504 mins 48.81 seconds: gen_loss=13.2425, dis_loss=0.0000756
+Running the code on device: cuda
+
+Image Shape:  (3, 128, 128)
+
+List of 10  Environments:-
+	1: ALE/Breakout-v5
+	2: ALE/Alien-v5
+	3: ALE/Atlantis-v5
+	4: ALE/Robotank-v5
+	5: ALE/Pitfall-v5
+	6: ALE/VideoCube-v5
+	7: ALE/VideoCheckers-v5
+	8: ALE/BattleZone-v5
+	9: ALE/Qbert-v5
+	10: ALE/KungFuMaster-v5
+
+Trained the GAN for Atari games image synthesis for 50 iterations in 0 hours, 1 mins, and 10 secs: Generator_Loss=14.673180  Discriminator_Loss=1.260259
+Trained the GAN for Atari games image synthesis for 100 iterations in 0 hours, 2 mins, and 20 secs: Generator_Loss=35.574182  Discriminator_Loss=0.087913
+Trained the GAN for Atari games image synthesis for 150 iterations in 0 hours, 3 mins, and 30 secs: Generator_Loss=32.809126  Discriminator_Loss=0.298351
+Trained the GAN for Atari games image synthesis for 200 iterations in 0 hours, 4 mins, and 41 secs: Generator_Loss=79.532125  Discriminator_Loss=0.052655
+Trained the GAN for Atari games image synthesis for 250 iterations in 0 hours, 5 mins, and 51 secs: Generator_Loss=82.223944  Discriminator_Loss=0.000000
+...
+
+Saved GAN generated and real images in tensorboard at iteration number 500
+
 ...
 ...
-Finished 999700 iterations for batch_size 16 in 687 mins 30.45 seconds: gen_loss=9.7217, dis_loss=0.0002342
-Finished 999800 iterations for batch_size 16 in 687 mins 33.83 seconds: gen_loss=9.8177, dis_loss=0.0002536
-Finished 999900 iterations for batch_size 16 in 687 mins 37.16 seconds: gen_loss=9.5558, dis_loss=0.0008187
-Finished 1000000 iterations for batch_size 16 in 687 mins 40.59 seconds: gen_loss=9.4748, dis_loss=0.0003078
+Trained the GAN for Atari games image synthesis for 30250 iterations in 11 hours, 6 mins, and 53 secs: Generator_Loss=9.519476  Discriminator_Loss=0.552391
+Trained the GAN for Atari games image synthesis for 30300 iterations in 11 hours, 8 mins, and 10 secs: Generator_Loss=10.392010  Discriminator_Loss=0.168032
+Trained the GAN for Atari games image synthesis for 30350 iterations in 11 hours, 9 mins, and 20 secs: Generator_Loss=10.334563  Discriminator_Loss=0.066586
 
-Saving image in tensorboard at Iteration No 1000000
+...
 
-Finished training the network: 1000000 iterations in 687 mins and 40 seconds.
+Saved GAN generated and real images in tensorboard at iteration number 100000
+
+Finished training the network: 100000 iterations in 34 hours, 12 mins, and 41 secs.
 ```

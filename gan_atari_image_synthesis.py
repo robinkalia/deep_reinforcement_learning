@@ -98,8 +98,8 @@ class Discriminator(nn.Module):
 
 # When you set the filter size(=Kh x Kw), stride(=s), and padding(=p) values in the Conv2d filter,
 # after convolution with this filter on an image of size HxW, your new image size(=FhXFw) will be
-# Fh = (H - 2*floor(Kh/2) + 2*p) / s
-# Fw = (W - 2*floor(Kw/2) + 2*p) / s
+# Fh = (H - 2*floor(Kh/2) + 2*p) / s + 1
+# Fw = (W - 2*floor(Kw/2) + 2*p) / s + 1
 class Generator(nn.Module):
     def __init__(self, output_shape):
         super(Generator, self).__init__()
@@ -164,10 +164,11 @@ def get_elapsed_time(start_time, curr_time) -> Tuple[int, int, int]:
 
 def train(envs: List[gym.Env], writer: SummaryWriter, device: torch.device):
     image_shape = envs[0].observation_space.shape
-    print("Image Shape: ", image_shape)
-    print("List of", len(envs), " Environments:-")
+    print("\nImage Shape: ", image_shape)
+    print("\nList of", len(envs), " Environments:-")
     for idx in range(len(envs)):
         print(f"\t{idx+1}: {envs[idx].get_env_id()}")
+    print("\n")
 
     discriminator_network = Discriminator(input_shape=image_shape)
     discriminator_network = discriminator_network.to(device)
@@ -261,6 +262,7 @@ def train(envs: List[gym.Env], writer: SummaryWriter, device: torch.device):
 
             real_images_grid = visionutils.make_grid(batch_images.data[:64], nrow=NUM_IMAGES_GRID_ROW, padding=4, normalize=True)
             writer.add_image("Real Images", real_images_grid, num_iters)
+            print(f"\nSaved GAN generated and real images in tensorboard at iteration number {num_iters}\n")
 
         if num_iters % total_max_num_iterations == 0:
             break
@@ -282,10 +284,10 @@ if __name__ == "__main__":
 
     if DEBUG_STEPS:
         num_envs = DEBUG_NUM_ENVS
-        print("Running in DEBUG mode...")
+        print("\nRunning in DEBUG mode...\n")
     else:
         num_envs = max(1, min(int(args.num_envs), len(atari_games_env_list)))
-        print("Running in PRODUCTION mode...")
+        print("\nRunning in PRODUCTION mode...\n")
     envs = [InputWrapper(gym.make(env)) for env in atari_games_env_list[:num_envs]]
 
     if torch.cuda.is_available():
@@ -298,7 +300,7 @@ if __name__ == "__main__":
         # Just use CPU if you don't have either GPU support or an Apple Computer with M2+ series chips that come with MPS support already enabled.
         device = torch.device("cpu")
 
-    print("Running the code on device:", device)
+    print("\nRunning the code on device:", device)
 
     writer = SummaryWriter()
     train(envs, writer, device)
