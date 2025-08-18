@@ -37,6 +37,12 @@ NUM_IMAGES_GRID_ROW = 16
 
 MAX_NUM_ITERATIONS = 1000000
 
+DEBUG_STEPS = False
+DEBUG_NUM_ENVS = 4
+DEBUG_NUM_STEPS_WRITE_REPORT = 10
+DEBUG_NUM_STEPS_SAVE_IMAGES = 50
+DEBUG_MAX_NUM_ITERATIONS = 1000
+
 # Input wrapper for the environments whose purpose is to basically return images of original size: 210x160
 # and resize them to a target size of 128x128 and return them.
 class InputWrapper(gym.ObservationWrapper):
@@ -47,12 +53,16 @@ class InputWrapper(gym.ObservationWrapper):
         self.observation_space = spaces.Box(
             self.observation(curr_space.low), self.observation(curr_space.high), dtype=np.float32
         )
+        self.env_id = self.env.unwrapped.spec.id
 
     def observation(self, obs: gym.core.ObsType) -> gym.core.ObsType:
         resized_im = cv2.resize(obs, (PROCESSING_WIDTH, PROCESSING_HEIGHT))
         # Transform from (w, h, c) to (c, w, h). Move channel column to first dimension.
         resized_im = np.moveaxis(resized_im, 2, 0)
         return resized_im.astype(np.float32)
+
+    def get_env_id(self) -> str:
+        return self.env_id
 
 
 class Discriminator(nn.Module):
@@ -80,10 +90,15 @@ class Discriminator(nn.Module):
 
     def forward(self, x):
         res = self.discriminator_model(x)
-        print(f"Discriminator Model: x.shape={x.shape}\tres.shape={res.shape}")
+        if DEBUG_STEPS:
+            print(f"Discriminator Model: x.shape={x.shape}\tres.shape={res.shape}")
         return res.view(-1, 1).squeeze(dim=1)
 
 
+# When you set the filter size(=Kh x Kw), stride(=s), and padding(=p) values in the Conv2d filter,
+# after convolution with this filter on an image of size HxW, your new image size(=FhXFw) will be
+# Fh = (H - 2*floor(Kh/2) + 2*p) / s
+# Fw = (W - 2*floor(Kw/2) + 2*p) / s
 class Generator(nn.Module):
     def __init__(self, output_shape):
         super(Generator, self).__init__()
@@ -148,7 +163,10 @@ def get_elapsed_time(start_time, curr_time) -> Tuple[int, int, int]:
 def train(envs: List[gym.Env], writer: SummaryWriter, device: torch.device):
     image_shape = envs[0].observation_space.shape
     print("Image Shape: ", image_shape)
-    print("List of", len(envs), " Environments:-\n", envs)
+    print("List of", len(envs), " Environments:-")
+    for idx in range(len(envs)):
+        print(f"\t{idx+1}: {envs[idx].get_env_id()}")
+
     discriminator_network = Discriminator(input_shape=image_shape)
     discriminator_network = discriminator_network.to(device)
 
@@ -158,6 +176,9 @@ def train(envs: List[gym.Env], writer: SummaryWriter, device: torch.device):
     disc_optim = optim.Adam(discriminator_network.parameters(), lr=0.001, weight_decay=1e-4, betas=(0.9, 0.99))
     gen_optim = optim.Adam(generator_network.parameters(), lr=0.001, weight_decay=1e-4, betas=(0.9, 0.99))
 
+    # Always make sure to first have input as predictions and then target as the labels when passing arguments
+    # to the the loss computation function else you will run into a whole myriad of errors resulting in loss
+    # values as NaNs if not crashing the program run completely.
     loss_func = nn.BCELoss()
 
     # There are 2 label values: 1 for real images that we grab from Atari games' environment
@@ -167,6 +188,10 @@ def train(envs: List[gym.Env], writer: SummaryWriter, device: torch.device):
 
     generator_losses = []
     discriminator_losses = []
+
+    num_steps_write_report = DEBUG_NUM_STEPS_WRITE_REPORT if DEBUG_STEPS else NUM_STEPS_WRITE_REPORT
+    num_steps_save_images = DEBUG_NUM_STEPS_SAVE_IMAGES if DEBUG_STEPS else NUM_STEPS_SAVE_IMAGES
+    total_max_num_iterations = DEBUG_MAX_NUM_ITERATIONS if DEBUG_STEPS else MAX_NUM_ITERATIONS
 
     start_time = time.time()
 
@@ -183,7 +208,10 @@ def train(envs: List[gym.Env], writer: SummaryWriter, device: torch.device):
         disc_optim.zero_grad()
         batch_images = batch_images.to(device)
         disc_pred_real_images = discriminator_network(batch_images)
-        print(f"batch_images.shape={batch_images.shape}\nResult from Discriminator network-disc_pred_real_images.shape={disc_pred_real_images.shape}")
+        if DEBUG_STEPS:
+            print(f"batch_images.shape={batch_images.shape}")
+            print(f"Result from Discriminator network-disc_pred_real_images.shape={disc_pred_real_images.shape}")
+
         # We create a copy of the generated images since we don't want the gradients to propagate as we use
         # the original tensor for generator images to the compute the generator loss in step 3 (next step).
         disc_pred_fake_images = discriminator_network(fake_gen_images.detach())
@@ -210,7 +238,7 @@ def train(envs: List[gym.Env], writer: SummaryWriter, device: torch.device):
         generator_losses.append(gen_loss.item())
 
         num_iters += 1
-        if num_iters % NUM_STEPS_WRITE_REPORT == 0:
+        if num_iters % num_steps_write_report == 0:
             curr_time = time.time()
             elapsed_time_hrs, elapsed_time_mins, elapsed_time_secs = get_elapsed_time(start_time, curr_time)
             gen_losses_mean = np.mean(generator_losses)
@@ -224,14 +252,14 @@ def train(envs: List[gym.Env], writer: SummaryWriter, device: torch.device):
             generator_losses = []
             discriminator_losses = []
 
-        if num_iters % NUM_STEPS_SAVE_IMAGES == 0:
+        if num_iters % num_steps_save_images == 0:
             fake_images_grid = visionutils.make_grid(fake_gen_images.data[:64], nrow=NUM_IMAGES_GRID_ROW, padding=4, normalize=True)
             writer.add_image("Generated Images", fake_images_grid, num_iters)
 
             real_images_grid = visionutils.make_grid(batch_images.data[:64], nrow=NUM_IMAGES_GRID_ROW, padding=4, normalize=True)
             writer.add_image("Real Images", real_images_grid, num_iters)
 
-        if num_iters % MAX_NUM_ITERATIONS == 0:
+        if num_iters % total_max_num_iterations == 0:
             break
 
     curr_time = time.time()
@@ -249,7 +277,12 @@ if __name__ == "__main__":
     parser.add_argument("--num_envs", default=num_atari_games_env, help="Subset of number of games used to train the model.")
     args = parser.parse_args()
 
-    num_envs = max(1, min(args.num_envs, len(atari_games_env_list)))
+    if DEBUG_STEPS:
+        num_envs = DEBUG_NUM_ENVS
+        print("Running in DEBUG mode...")
+    else:
+        num_envs = max(1, min(int(args.num_envs), len(atari_games_env_list)))
+        print("Running in PRODUCTION mode...")
     envs = [InputWrapper(gym.make(env)) for env in atari_games_env_list[:num_envs]]
 
     if torch.cuda.is_available():
