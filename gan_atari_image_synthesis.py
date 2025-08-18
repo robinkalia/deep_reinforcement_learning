@@ -43,6 +43,7 @@ DEBUG_NUM_STEPS_WRITE_REPORT = 10
 DEBUG_NUM_STEPS_SAVE_IMAGES = 50
 DEBUG_MAX_NUM_ITERATIONS = 1000
 
+
 # Input wrapper for the environments whose purpose is to basically return images of original size: 210x160
 # and resize them to a target size of 128x128 and return them.
 class InputWrapper(gym.ObservationWrapper):
@@ -151,10 +152,11 @@ def iterate_batches(envs: List[gym.Env], batch_size: int=BATCH_SIZE) -> tt.Gener
         if done or trunc:
             env.reset()
 
+
 def get_elapsed_time(start_time, curr_time) -> Tuple[int, int, int]:
     train_time_secs = curr_time - start_time
     elapsed_time_hrs = int(train_time_secs / 3600.0)
-    elapsed_time_mins = int((train_time_secs - 60*elapsed_time_hrs)  / 60.0)
+    elapsed_time_mins = int((train_time_secs - 3600 * elapsed_time_hrs) / 60.0)
     elapsed_time_secs = int(train_time_secs - 60 * elapsed_time_mins - 3600 * elapsed_time_hrs)
 
     return elapsed_time_hrs, elapsed_time_mins, elapsed_time_secs
@@ -245,7 +247,8 @@ def train(envs: List[gym.Env], writer: SummaryWriter, device: torch.device):
             dis_losses_mean = np.mean(discriminator_losses)
             print("Trained the GAN for Atari games image synthesis for %d iterations in %d hours, %d mins, and %d secs: Generator_Loss=%.6f  Discriminator_Loss=%.6f" \
                    % (num_iters, elapsed_time_hrs, elapsed_time_mins, elapsed_time_secs, gen_losses_mean, dis_losses_mean))
-            print("Generator Losses:", generator_losses, "\nDiscriminator Losses:", discriminator_losses, "\n")
+            if DEBUG_STEPS:
+                print("Generator Losses:", generator_losses, "\nDiscriminator Losses:", discriminator_losses, "\n")
 
             writer.add_scalar("Generator Loss", gen_losses_mean, num_iters)
             writer.add_scalar("Discriminator Loss", dis_losses_mean, num_iters)
