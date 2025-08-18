@@ -72,6 +72,10 @@ Sample images from tensorboard where `real` corresponds to the real Atari games'
 
 <img width="859" height="964" alt="Screenshot for GANs with Deep Reinforcement Learning - 0_1" src="https://github.com/user-attachments/assets/36f5466e-9f92-4c18-ae49-883484be4a00" />
 
+<img width="856" height="964" alt="Screenshot for GANs with Deep Reinforcement Learning - 0_2" src="https://github.com/user-attachments/assets/324e121b-a2ad-4f98-9583-4c8950736ddc" />
+
+<img width="1724" height="1133" alt="Screenshot for GANs with Deep Reinforcement Learning - 0_3" src="https://github.com/user-attachments/assets/06d0745f-f8ea-49d1-a6de-fa2be028f109" />
+
 <img width="772" height="1090" alt="Screenshot for GANs with Deep Reinforcement Learning - 2" src="https://github.com/user-attachments/assets/5c9967b2-2567-4fdf-b218-e156140d72f2" />
 
 <img width="1067" height="1118" alt="Screenshot for GANs with Deep Reinforcement Learning - 1" src="https://github.com/user-attachments/assets/16defce1-5a6b-4188-b715-66e0d125ea50" />
