@@ -8,7 +8,6 @@ from typing import List, Tuple
 import torch
 from torch import nn, optim
 from torch.utils.tensorboard.writer import SummaryWriter
-import torch.utils as vutils
 
 import gymnasium as gym
 from gymnasium import spaces
@@ -66,60 +65,76 @@ class InputWrapper(gym.ObservationWrapper):
         return self.env_id
 
 
+# When you set the filter size(=Kh x Kw), stride(=s), and padding(=p) values in the Conv2d filter,
+# after convolution with this filter on an image of size HxW, your new image size(=FhXFw) will be
+# Fh = (H - 2*floor(Kh/2) + 2*p) / s + 1
+# Fw = (W - 2*floor(Kw/2) + 2*p) / s + 1
 class Discriminator(nn.Module):
     def __init__(self, input_shape):
         super(Discriminator, self).__init__()
         # Converts the input image of size (3, 128, 128) into a final single floating point number at the end.
         self.discriminator_model = nn.Sequential(
+            # In: (3, 128, 128) -> Out: (128, 64, 64)
             nn.Conv2d(in_channels=input_shape[0], out_channels=NUM_DISCR_CHANNELS, kernel_size=4, stride=2, padding=1),
             nn.ReLU(),
+            # In: (128, 64, 64) -> Out: (256, 32, 32)
             nn.Conv2d(in_channels=NUM_DISCR_CHANNELS, out_channels=NUM_DISCR_CHANNELS*2, kernel_size=4, stride=2, padding=1),
             nn.BatchNorm2d(NUM_DISCR_CHANNELS*2),
             nn.ReLU(),
+            # In: (256, 32, 32) -> Out: (512, 16, 16)
             nn.Conv2d(in_channels=NUM_DISCR_CHANNELS*2, out_channels=NUM_DISCR_CHANNELS*4, kernel_size=4, stride=2, padding=1),
             nn.BatchNorm2d(NUM_DISCR_CHANNELS*4),
             nn.ReLU(),
+            # In: (512, 16, 16) -> Out: (1024, 8, 8)
             nn.Conv2d(in_channels=NUM_DISCR_CHANNELS*4, out_channels=NUM_DISCR_CHANNELS*8, kernel_size=4, stride=2, padding=1),
             nn.BatchNorm2d(NUM_DISCR_CHANNELS*8),
             nn.ReLU(),
+            # In: (1024, 8, 8) -> Out: (2048, 4, 4)
             nn.Conv2d(in_channels=NUM_DISCR_CHANNELS*8, out_channels=NUM_DISCR_CHANNELS*16, kernel_size=4, stride=2, padding=1),
             nn.BatchNorm2d(NUM_DISCR_CHANNELS*16),
             nn.ReLU(),
+            # In: (2048, 4, 4) -> Out: (1, 1, 1)
             nn.Conv2d(in_channels=NUM_DISCR_CHANNELS*16, out_channels=1, kernel_size=4, stride=1, padding=0),
             nn.Sigmoid()
         )
 
     def forward(self, x):
         res = self.discriminator_model(x)
+        final_res = res.view(-1, 1).squeeze(dim=1)
         if DEBUG_STEPS:
-            print(f"Discriminator Model: x.shape={x.shape}\tres.shape={res.shape}")
-        return res.view(-1, 1).squeeze(dim=1)
+            print(f"Discriminator Model: x.shape={x.shape}\tres.shape={res.shape}\tfinal_res.shape={final_res.shape}")
+        return final_res
 
-
-# When you set the filter size(=Kh x Kw), stride(=s), and padding(=p) values in the Conv2d filter,
+# When you set the filter size(=Kh x Kw), stride(=s), and padding(=p) values in the ConvTranspose2d filter,
 # after convolution with this filter on an image of size HxW, your new image size(=FhXFw) will be
-# Fh = (H - 2*floor(Kh/2) + 2*p) / s + 1
-# Fw = (W - 2*floor(Kw/2) + 2*p) / s + 1
+# Fh = s*(H - 1) + 2*floor(Kh/2) - 2*p
+# Fw = s*(W - 1) + 2*floor(Kw/2) - 2*p
 class Generator(nn.Module):
     def __init__(self, output_shape):
         super(Generator, self).__init__()
-        # Converts a given vector to an image of size (3, 128, 128) at the end.
+        # Converts a given vector of size (100, 1, 1) to an image of size (3, 128, 128) at the end.
         self.generator_model = nn.Sequential(
+            # In: (100, 1, 1) -> Out: (2048, 4, 4)
             nn.ConvTranspose2d(in_channels=LATENT_VEC_SIZE, out_channels=NUM_GENER_CHANNELS*16, kernel_size=4, stride=1, padding=0),
             nn.BatchNorm2d(NUM_GENER_CHANNELS * 16),
             nn.ReLU(),
+            # In: (2048, 4, 4) -> Out: (1024, 8, 8)
             nn.ConvTranspose2d(in_channels=NUM_GENER_CHANNELS*16, out_channels=NUM_GENER_CHANNELS*8, kernel_size=4, stride=2, padding=1),
             nn.BatchNorm2d(NUM_GENER_CHANNELS * 8),
             nn.ReLU(),
+            # In: (1024, 8, 8) -> Out: (512, 16, 16)
             nn.ConvTranspose2d(in_channels=NUM_GENER_CHANNELS*8, out_channels=NUM_GENER_CHANNELS*4, kernel_size=4, stride=2, padding=1),
             nn.BatchNorm2d(NUM_GENER_CHANNELS * 4),
             nn.ReLU(),
+            # In: (512, 16, 16) -> Out: (256, 32, 32)
             nn.ConvTranspose2d(in_channels=NUM_GENER_CHANNELS*4, out_channels=NUM_GENER_CHANNELS*2, kernel_size=4, stride=2, padding=1),
             nn.BatchNorm2d(NUM_GENER_CHANNELS * 2),
             nn.ReLU(),
+            # In: (256, 32, 32) -> Out: (128, 64, 64)
             nn.ConvTranspose2d(in_channels=NUM_GENER_CHANNELS*2, out_channels=NUM_GENER_CHANNELS, kernel_size=4, stride=2, padding=1),
             nn.BatchNorm2d(NUM_GENER_CHANNELS),
             nn.ReLU(),
+            # In: (128, 64, 64) -> Out: (3, 128, 128)
             nn.ConvTranspose2d(in_channels=NUM_GENER_CHANNELS, out_channels=output_shape[0], kernel_size=4, stride=2, padding=1),
             nn.Tanh()
         )
@@ -131,11 +146,13 @@ class Generator(nn.Module):
 
 def iterate_batches(envs: List[gym.Env], batch_size: int=BATCH_SIZE) -> tt.Generator[torch.Tensor, None, None]:
     batches = [env.reset()[0] for env in envs]
+    env_gen = iter(lambda: random.choice(envs), None)
 
-    env = random.choice(envs)
     while True:
+        env = next(env_gen)
         action = env.action_space.sample()
         obs, reward, done, trunc, info = env.step(action)
+
         if np.mean(obs) > IMAGE_MEAN_THRESH:
             batches.append(obs)
 
@@ -143,10 +160,15 @@ def iterate_batches(envs: List[gym.Env], batch_size: int=BATCH_SIZE) -> tt.Gener
         # Ideally we should have that because each environment corresponds to a different game and so if you have a lot of
         # games it will take a lot of iterations and the results will not be that good from this simple GAN architecture for
         # image synthesis.
-        if (len(batches) == BATCH_SIZE):
+        if (len(batches) == batch_size):
             batch_images = np.array(batches, dtype=np.float32)
+
+            # Normalize the image pixels to [-1.0, 1.0] floating poing range before
+            # yielding the batch of normalized images from the generator function.
             norm_images = torch.tensor(batch_images * 2.0 / 255.0 - 1.0)
+
             yield norm_images
+
             batches.clear()
 
         if done or trunc:
@@ -162,7 +184,7 @@ def get_elapsed_time(start_time, curr_time) -> Tuple[int, int, int]:
     return elapsed_time_hrs, elapsed_time_mins, elapsed_time_secs
 
 
-def train(envs: List[gym.Env], writer: SummaryWriter, device: torch.device):
+def train(envs: List[gym.Env], writer: SummaryWriter, device: torch.device) -> None:
     image_shape = envs[0].observation_space.shape
     print("\nImage Shape: ", image_shape)
     print("\nList of", len(envs), " Environments:-")
@@ -200,7 +222,7 @@ def train(envs: List[gym.Env], writer: SummaryWriter, device: torch.device):
 
     num_iters = 0
     for batch_images in iterate_batches(envs):
-        # The next 3 steps essentially define the training steps of a Generative Adversarial Network (GAN)
+        # The next 3 steps essentially define the training steps of a Generative Adversarial Network (GAN).
         # Step 1: Generate fake images from a random vector using the Generator network.
         rand_generator_input = torch.FloatTensor(BATCH_SIZE, LATENT_VEC_SIZE, 1, 1)
         rand_generator_input.normal_(0,1)
@@ -218,8 +240,8 @@ def train(envs: List[gym.Env], writer: SummaryWriter, device: torch.device):
         # We create a copy of the generated images since we don't want the gradients to propagate as we use
         # the original tensor for generator images to the compute the generator loss in step 3 (next step).
         disc_pred_fake_images = discriminator_network(fake_gen_images.detach())
-        # Calculate the combined loss on both real and fake images while giving them
-        # the same weightage initially. However, we can tune this relative ratio as a hyperparameter.
+        # Calculate the combined loss on both real and fake images while giving them the same
+        # weightage initially. However, we can tune this relative ratio as a hyperparameter.
         disc_loss = loss_func(disc_pred_real_images, generic_true_labels) +  \
                     loss_func(disc_pred_fake_images, generic_fake_labels)
         disc_loss.backward()
@@ -231,10 +253,10 @@ def train(envs: List[gym.Env], writer: SummaryWriter, device: torch.device):
         gen_optim.zero_grad()
         # Recompute the predictions from the updated discriminator network for the same fake images.
         updated_disc_pred_fake_images_recomputed = discriminator_network(fake_gen_images)
-        # For the generator we have to check how further the discriminator is computing predictions
-        # for these fake generated images from true labels. The generator wants the discriminator to
-        # predict these fake images that it has genererated as true labels. That is why we compute
-        # the generator loss as KL divergence between these discriminator predictions and true labels.
+        # For the generator we have to check how further the discriminator is computing predictions for
+        # these fake generated images from true labels. The generator wants the discriminator to predict
+        # these fake images that it has genererated as true labels. That is why we compute the generator
+        # loss as KL divergence between these updated discriminator predictions and true labels.
         gen_loss = loss_func(updated_disc_pred_fake_images_recomputed, generic_true_labels)
         gen_loss.backward()
         gen_optim.step()
