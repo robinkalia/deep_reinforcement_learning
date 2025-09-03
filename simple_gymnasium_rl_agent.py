@@ -7,6 +7,7 @@
 import gymnasium as gym
 import random
 import enum
+import pygame
 
 
 class AgentInitializationApproach(enum.Enum):
@@ -67,6 +68,10 @@ if __name__ == "__main__":
     env = setup_environment(agent_init_approach)
     obs, info = env.reset()
     rl_agent = RLAgent()
+
+    # The environment uses Pygame internally for human rendering. Call this function after
+    # the first render or reset, as the display window is typically initialized then.
+    pygame.display.set_caption("CartPole-v1: RL Agent Interaction")
 
     MAX_NUM_STEPS = 1000
 
