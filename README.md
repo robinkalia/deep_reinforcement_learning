@@ -131,3 +131,47 @@ Saved GAN generated and real images in tensorboard at iteration number 100000
 
 Finished training the network: 100000 iterations in 34 hours, 12 mins, and 41 secs.
 ```
+
+3) `cross_entropy_cartpole_rl_agent.py`: CartPole-v1: Cross Entropy - Model-Free, Policy Based, On-Policy Method.
+
+a) Model Free -> Does not build a model of the environment to predict next action or reward.
+
+b) Policy Based `π(a|s)` -> Builds a probability distribution over actions with observations as input.
+   Different from Value based methods that check all actions to select the action which gives the best reward.
+
+c) On-Policy -> Uses observations from actions that we get from the policy that we are updating. Does not use
+   the observations from previous episodes.
+
+```
+$ python cross_entropy_cartpole_rl_agent.py
+
+env_obs_space_shape = (4,) 	action.size = 2
+
+Running the code on device: cuda
+
+Policy Network:-
+ Policy(
+  (network): Sequential(
+    (0): Linear(in_features=4, out_features=256, bias=True)
+    (1): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+    (2): ReLU()
+    (3): Linear(in_features=256, out_features=512, bias=True)
+    (4): LayerNorm((512,), eps=1e-05, elementwise_affine=True)
+    (5): ReLU()
+    (6): Linear(in_features=512, out_features=2, bias=True)
+  )
+)
+
+Iteration no 1: Avg Loss from filtered 162 episodes = 0.6875171661376953  Reward Threshold = 20.5  Reward Mean = 20.1875  Elapsed Time: 0 hours, 0 mins, and 7 secs
+Iteration no 2: Avg Loss from filtered 414 episodes = 0.6084024310112  Reward Threshold = 49.0  Reward Mean = 45.9375  Elapsed Time: 0 hours, 0 mins, and 22 secs
+Iteration no 3: Avg Loss from filtered 458 episodes = 0.5593582391738892  Reward Threshold = 70.5  Reward Mean = 65.875  Elapsed Time: 0 hours, 0 mins, and 44 secs
+Iteration no 4: Avg Loss from filtered 461 episodes = 0.5255176424980164  Reward Threshold = 64.0  Reward Mean = 60.125  Elapsed Time: 0 hours, 1 mins, and 3 secs
+Iteration no 5: Avg Loss from filtered 771 episodes = 0.5293067097663879  Reward Threshold = 120.0  Reward Mean = 99.5625  Elapsed Time: 0 hours, 1 mins, and 36 secs
+...
+...
+Iteration no 33: Avg Loss from filtered 2236 episodes = 0.4848739206790924  Reward Threshold = 414.0  Reward Mean = 369.875  Elapsed Time: 0 hours, 31 mins, and 19 secs
+Iteration no 34: Avg Loss from filtered 2495 episodes = 0.45061811804771423  Reward Threshold = 493.0  Reward Mean = 428.0  Elapsed Time: 0 hours, 33 mins, and 38 secs
+Iteration no 35: Avg Loss from filtered 3500 episodes = 0.4489649534225464  Reward Threshold = 500.0  Reward Mean = 445.6875  Elapsed Time: 0 hours, 36 mins, and 2 secs
+Iteration no 36: Avg Loss from filtered 7500 episodes = 0.439805805683136  Reward Threshold = 500.0  Reward Mean = 498.25  Elapsed Time: 0 hours, 38 mins, and 43 secs
+Finished solving CartPole-v1 env in 36 iterations with final episode loss = 0.4398. Elapsed Time: 0 hours, 38 mins, and 43 secs.
+```

@@ -166,7 +166,7 @@ if __name__ == "__main__":
     print("\nRunning the code on device:", device)
 
     policy = Policy(in_ch=env_obs_space_shape[0], out_ch=action_size, hidden_channels=HIDDEN_LAYER_SIZE)
-    print("Policy Network:-\n", policy)
+    print("\nPolicy Network:-\n", policy)
     policy.to(device)
     loss_func = nn.CrossEntropyLoss()
     optimizer = optim.Adam(policy.parameters(), lr=0.001, weight_decay=1e-4, betas=(0.9, 0.99))
@@ -197,7 +197,7 @@ if __name__ == "__main__":
         writer.add_scalar("Reward Mean", reward_mean, iter_no)
 
         if reward_mean > MAX_REWARD_VALUE:
-            print("Finished solving CartPole-v1 env in %d iterations with final episode loss = %.4f. Elapsed Time: %d hours, %d mins, and %d secs." % \
+            print("\nFinished solving CartPole-v1 env in %d iterations with final episode loss = %.4f. Elapsed Time: %d hours, %d mins, and %d secs." % \
                   (iter_no, loss.item(), elapsed_time_hrs, elapsed_time_mins, elapsed_time_secs))
             break
 
