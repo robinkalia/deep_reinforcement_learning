@@ -442,7 +442,8 @@ if __name__ == "__main__":
         # For Apple's Silicon chip beginning from M2 with support for Metal Performance Shaders (mps).
         device = torch.device("mps")
     else:
-        # Just use CPU if you don't have either GPU support or an Apple Computer with M2+ series chips that come with MPS support already enabled.
+        # Just use CPU if you don't have either GPU support or an Apple Computer
+        # with M2+ series chips that come with MPS support already enabled.
         device = torch.device("cpu")
 
     print("\nRunning the code on device:", device)

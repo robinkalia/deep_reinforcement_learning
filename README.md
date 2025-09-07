@@ -132,19 +132,21 @@ Saved GAN generated and real images in tensorboard at iteration number 100000
 Finished training the network: 100000 iterations in 34 hours, 12 mins, and 41 secs.
 ```
 
-3) `cross_entropy_cartpole_rl_agent.py`: CartPole-v1: Cross Entropy - Model-Free, Policy Based, On-Policy Method.
+3) `cross_entropy_cartpole_frozenlake_rl_agent.py`: `CartPole-v1` & `FrozenLake-v1` games environment: Cross Entropy - Model-Free, Policy Based, On-Policy Method.
 
 a) Model Free -> Does not build a model of the environment to predict next action or reward.
 
 b) Policy Based `π(a|s)` -> Builds a probability distribution over actions with observations as input.
    Different from Value based methods that check all actions to select the action which gives the best reward.
 
-c) On-Policy -> Uses observations from actions that we get from the policy that we are updating. Does not use
+c) On-Policy -> Uses observations from actions that we get from the current policy that we are updating. Does not use
    the observations from previous episodes.
 
+i) `CartPole-v1`
 ```
-$ python cross_entropy_cartpole_rl_agent.py
+$ python cross_entropy_cartpole_frozenlake_rl_agent.py --env CartPole
 
+Playing the game environment: CartPole-v1
 env_obs_space_shape = (4,) 	action.size = 2
 
 Running the code on device: cuda
@@ -174,4 +176,39 @@ Iteration no 34: Avg Loss from filtered 2495 episodes = 0.45061811804771423  Rew
 Iteration no 35: Avg Loss from filtered 3500 episodes = 0.4489649534225464  Reward Threshold = 500.0  Reward Mean = 445.6875  Elapsed Time: 0 hours, 36 mins, and 2 secs
 Iteration no 36: Avg Loss from filtered 7500 episodes = 0.439805805683136  Reward Threshold = 500.0  Reward Mean = 498.25  Elapsed Time: 0 hours, 38 mins, and 43 secs
 Finished solving CartPole-v1 env in 36 iterations with final episode loss = 0.4398. Elapsed Time: 0 hours, 38 mins, and 43 secs.
+```
+
+ii) `FrozenLake-v1`
+```
+python cross_entropy_cartpole_frozenlake_rl_agent.py --env FrozenLake
+
+Playing the game environment: FrozenLake-v1
+env_obs_space_shape = (16,) 	action.size = 4
+
+Running the code on device: mps
+
+Policy Network:-
+ Policy(
+  (network): Sequential(
+    (0): Linear(in_features=16, out_features=256, bias=True)
+    (1): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+    (2): ReLU()
+    (3): Linear(in_features=256, out_features=512, bias=True)
+    (4): LayerNorm((512,), eps=1e-05, elementwise_affine=True)
+    (5): ReLU()
+    (6): Linear(in_features=512, out_features=4, bias=True)
+  )
+)
+
+Iteration no 1: Avg Loss from 3 filtered elite episodes with 28 episode steps = 1.3304394483566284  Reward Threshold = 0.531441  Reward Mean = 0.011906761345496104  Elapsed Time: 0 hours, 3 mins, and 30 secs
+Iteration no 2: Avg Loss from 4 filtered elite episodes with 34 episode steps = 1.1078670024871826  Reward Threshold = 0.531441  Reward Mean = 0.01671958383057874  Elapsed Time: 0 hours, 6 mins, and 33 secs
+Iteration no 3: Avg Loss from 6 filtered elite episodes with 54 episode steps = 0.9129630327224731  Reward Threshold = 0.531441  Reward Mean = 0.023868519799030968  Elapsed Time: 0 hours, 9 mins, and 10 secs
+Iteration no 4: Avg Loss from 9 filtered elite episodes with 87 episode steps = 0.8517952561378479  Reward Threshold = 0.531441  Reward Mean = 0.03243154459454831  Elapsed Time: 0 hours, 11 mins, and 57 secs
+Iteration no 5: Avg Loss from 12 filtered elite episodes with 131 episode steps = 0.8823782801628113  Reward Threshold = 0.531441  Reward Mean = 0.03823237425524295  Elapsed Time: 0 hours, 14 mins, and 47 secs
+...
+...
+Iteration no 19: Avg Loss from 46 filtered elite episodes with 476 episode steps = 0.7461742758750916  Reward Threshold = 0.531441  Reward Mean = 0.11597856840308171  Elapsed Time: 0 hours, 53 mins, and 40 secs
+Iteration no 20: Avg Loss from 51 filtered elite episodes with 530 episode steps = 0.7389541268348694  Reward Threshold = 0.531441  Reward Mean = 0.1248935337542685  Elapsed Time: 0 hours, 56 mins, and 16 secs
+Iteration no 21: Avg Loss from 56 filtered elite episodes with 594 episode steps = 0.7564355731010437  Reward Threshold = 0.531441  Reward Mean = 0.1304198625031866  Elapsed Time: 0 hours, 58 mins, and 56 secs
+Iteration no 22: Avg Loss from 59 filtered elite episodes with 630 episode steps = 0.7613645792007446  Reward Threshold = 0.531441  Reward Mean = 0.13234486306288937  Elapsed Time: 1 hours, 1 mins, and 28 secs
 ```
