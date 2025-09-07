@@ -23,6 +23,9 @@ import torch.nn as nn
 
 from torch.utils.tensorboard.writer import SummaryWriter
 
+from utils import get_elapsed_time
+
+
 HIDDEN_LAYER_SIZE = 256
 BATCH_SIZE = 16
 REWARD_BOUNDARY_PERCENTILE = 70
@@ -118,15 +121,6 @@ def filter_episodes(episodes: List[Episode], device: torch.device, reward_bounda
     filtered_episode_actions_tensor = torch.tensor(filtered_episode_actions, dtype=torch.long, device=device)
 
     return filtered_episode_observations_tensor, filtered_episode_actions_tensor, reward_boundary_thresh, reward_mean
-
-
-def get_elapsed_time(start_time, curr_time) -> Tuple[int, int, int]:
-    train_time_secs = curr_time - start_time
-    elapsed_time_hrs = int(train_time_secs / 3600.0)
-    elapsed_time_mins = int((train_time_secs - 3600 * elapsed_time_hrs) / 60.0)
-    elapsed_time_secs = int(train_time_secs - 60 * elapsed_time_mins - 3600 * elapsed_time_hrs)
-
-    return elapsed_time_hrs, elapsed_time_mins, elapsed_time_secs
 
 
 def setup_environment(agent_init_approach: AgentInitializationApproach) -> gym.Env:

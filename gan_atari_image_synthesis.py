@@ -22,6 +22,9 @@ import time
 
 import torchvision.utils as visionutils
 
+from utils import get_elapsed_time
+
+
 LATENT_VEC_SIZE = 100
 
 PROCESSING_WIDTH = 128
@@ -179,15 +182,6 @@ def iterate_batches(envs: List[gym.Env], batch_size: int=BATCH_SIZE) -> tt.Gener
 
         if done or trunc:
             env.reset()
-
-
-def get_elapsed_time(start_time, curr_time) -> Tuple[int, int, int]:
-    train_time_secs = curr_time - start_time
-    elapsed_time_hrs = int(train_time_secs / 3600.0)
-    elapsed_time_mins = int((train_time_secs - 3600 * elapsed_time_hrs) / 60.0)
-    elapsed_time_secs = int(train_time_secs - 60 * elapsed_time_mins - 3600 * elapsed_time_hrs)
-
-    return elapsed_time_hrs, elapsed_time_mins, elapsed_time_secs
 
 
 def train(envs: List[gym.Env], writer: SummaryWriter, device: torch.device) -> None:
