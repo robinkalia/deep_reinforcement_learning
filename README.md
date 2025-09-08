@@ -143,6 +143,9 @@ c) On-Policy -> Uses observations from actions that we get from the current poli
    the observations from previous episodes.
 
 i) `CartPole-v1`
+
+<img width="1592" height="732" alt="cartpole_v1-1" src="https://github.com/user-attachments/assets/0609572b-d6dd-4100-945b-7ca1e3fd7ce6" />
+
 ```
 $ python cross_entropy_cartpole_frozenlake_rl_agent.py --env CartPole
 
@@ -179,6 +182,11 @@ Finished solving CartPole-v1 env in 36 iterations with final episode loss = 0.43
 ```
 
 ii) `FrozenLake-v1`
+
+<img width="252" height="281" alt="frozen_lake_v1-1_0" src="https://github.com/user-attachments/assets/58b0ce90-ace2-4dbd-8ee4-fb8491a73aa4" />
+
+<img width="254" height="277" alt="frozen_lake_v1-1_1" src="https://github.com/user-attachments/assets/fb0e41fd-6da2-4baa-ba0c-3c9d2eaa5ed3" />
+
 ```
 python cross_entropy_cartpole_frozenlake_rl_agent.py --env FrozenLake
 
