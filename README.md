@@ -187,6 +187,10 @@ ii) `FrozenLake-v1`
 
 <img width="254" height="277" alt="frozen_lake_v1-1_1" src="https://github.com/user-attachments/assets/fb0e41fd-6da2-4baa-ba0c-3c9d2eaa5ed3" />
 
+<img width="253" height="280" alt="frozen_lake_v1-1_2" src="https://github.com/user-attachments/assets/43f34020-0045-41e3-b9c4-3f55686370b7" />
+
+<img width="252" height="275" alt="frozen_lake_v1-1_3" src="https://github.com/user-attachments/assets/c35a2668-4088-4c38-947e-30cf3f8b5323" />
+
 ```
 python cross_entropy_cartpole_frozenlake_rl_agent.py --env FrozenLake
 
